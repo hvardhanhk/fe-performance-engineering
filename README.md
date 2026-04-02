@@ -189,6 +189,36 @@ Enforced in `.lighthouserc.js` — PRs that regress below these thresholds fail 
 | JS bundle | ≤ 200KB |
 | Total payload | ≤ 500KB |
 
+### Running Lighthouse CI locally
+
+```bash
+# Build first, then run all audits + assert budgets
+npm run build && npm run lhci
+
+# Skip uploading reports to public storage
+npm run build && npx lhci autorun --no-upload
+```
+
+Reports are saved to `.lighthouseci/` as JSON and HTML after every run.
+
+### `LHCI_GITHUB_APP_TOKEN` (optional)
+
+The token is **not required** — lhci audits, asserts budgets, and fails CI without it. It only enables inline status check annotations on PRs:
+
+```
+✅ Lighthouse CI — Performance: 94  LCP: 1.8s  CLS: 0.02
+```
+
+#### How to set it (if you want the PR annotations)
+
+1. Install the [Lighthouse CI GitHub App](https://github.com/apps/lighthouse-ci) on your repo
+2. Copy the token the app provides
+3. Go to **GitHub repo → Settings → Secrets and variables → Actions → New repository secret**
+   - Name: `LHCI_GITHUB_APP_TOKEN`
+   - Value: the token from step 2
+
+Not relevant for Vercel — Vercel posts its own deployment status separately.
+
 ---
 
 ## Scaling Strategy
