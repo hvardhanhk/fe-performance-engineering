@@ -1,0 +1,48 @@
+version: 2
+
+updates:
+  # ─── npm dependencies ───────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    # Open a maximum of 5 PRs at once — avoids review queue flooding
+    open-pull-requests-limit: 5
+    # Group all non-breaking updates into a single PR per week.
+    # Security updates always get their own PR regardless of grouping.
+    groups:
+      non-breaking:
+        # patch and minor bumps together — still safe to batch
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Ignore major version bumps — review those manually
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ─── GitHub Actions ──────────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+      - "automated"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"

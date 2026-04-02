@@ -26,7 +26,8 @@ module.exports = {
       settings: {
         // Lighthouse mobile preset: Moto G4-class device emulation
         preset: "perf",
-        throttlingMethod: "devtools",
+        // Same reasoning as desktop: simulate is deterministic in CI.
+        throttlingMethod: "simulate",
         // Simulates mid-tier 4G (typical emerging-market mobile conditions)
         throttling: {
           rttMs: 150,
@@ -100,8 +101,7 @@ module.exports = {
     },
 
     upload: {
-      target: "filesystem",
-      outputDir: ".lighthouseci-mobile",
+      target: "temporary-public-storage",
     },
   },
 };

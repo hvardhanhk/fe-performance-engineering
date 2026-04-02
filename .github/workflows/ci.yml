@@ -109,6 +109,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Security audit
+        # Fails the build if any high or critical CVE is found in dependencies.
+        # Use --audit-level=moderate to tighten further once all current
+        # advisories are resolved.
+        run: npm audit --audit-level=high
+
       - name: Build
         run: npm run build
         env:
@@ -153,10 +159,17 @@ jobs:
 
       - name: Assert performance budgets
         run: npx lhci assert
+
+      # Upload posts results to temporary-public-storage and triggers the
+      # Lighthouse CI GitHub App to post a status check on the PR/commit.
+      # The token is what authorises the App to write that check.
+      - name: Upload reports + post GitHub status
+        run: npx lhci upload
+        if: always()
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
-      - name: Upload Lighthouse reports
+      - name: Upload Lighthouse reports as artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -195,12 +208,18 @@ jobs:
       - name: Assert performance budgets (mobile)
         run: npx lhci assert --config=.lighthouserc.mobile.js
 
-      - name: Upload Lighthouse mobile reports
+      - name: Upload reports + post GitHub status (mobile)
+        run: npx lhci upload --config=.lighthouserc.mobile.js
+        if: always()
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse mobile reports as artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: lighthouse-reports-mobile
-          path: .lighthouseci-mobile/
+          path: .lighthouseci/
           retention-days: 30
           if-no-files-found: warn
 

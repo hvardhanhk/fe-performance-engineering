@@ -267,11 +267,50 @@ npm test -- --ci   →  39 passed, 3 suites, 0 failures
 | Lighthouse CI | Split `lhci autorun` → `collect` + `assert` — reports always flush before assertion exit-1 | `.github/workflows/ci.yml` |
 | Lighthouse CI | `target: "temporary-public-storage"` → `"filesystem"` — reports saved as CI artifacts, no expiring public URLs | `.lighthouserc.js` |
 | Lighthouse CI | Introduced `assertMatrix` for per-URL budgets: strict on `/optimized`/`/dashboard`, relaxed on `/bad`, minimal on `/` | `.lighthouserc.js` |
-| Lighthouse CI | `throttlingMethod: "simulate"` → `"devtools"` — real Chrome Protocol throttling | `.lighthouserc.js` |
+| Lighthouse CI | `throttlingMethod: "simulate"` → `"devtools"` — real Chrome Protocol throttling *(reverted in next session)* | `.lighthouserc.js` |
 | Lighthouse CI | `startServerReadyTimeout` raised to 60 000 ms for cold CI runners | `.lighthouserc.js` |
 | Lighthouse CI | Added mobile Lighthouse run: Moto G4 emulation, 4G throttling, 4× CPU | `.lighthouserc.mobile.js`, `ci.yml`, `package.json` |
 | Dockerfile | Added `ARG DOCKER_BUILD=true` + `ENV DOCKER_BUILD` so the builder stage produces `.next/standalone` | `Dockerfile` |
 | Accessibility | Fixed `heading-order` violations on `/optimized` and `/dashboard` — 10 `h3` → `h2` across 6 components | `VitalsPanel.tsx`, `DashboardClient.tsx`, `CacheDemo.tsx`, `LatencyDemo.tsx`, `NavTimingPanel.tsx`, `WebPageTestPanel.tsx` |
+
+---
+
+## Changes Applied — 2026-04-03 (Session 2)
+
+> Implements priority backlog items 1–6 and wires the Lighthouse CI GitHub App.
+
+| # | Area | Change | File(s) |
+|---|------|--------|---------|
+| L-2 | Lighthouse CI | Reverted `throttlingMethod` to `"simulate"` in both configs with explanatory comment — `devtools` is non-deterministic on shared CI runners | `.lighthouserc.js`, `.lighthouserc.mobile.js` |
+| GitHub App | Lighthouse CI | Changed `target` from `"filesystem"` → `"temporary-public-storage"` in both configs so `lhci upload` has a URL to link in the GitHub PR status check | `.lighthouserc.js`, `.lighthouserc.mobile.js` |
+| GitHub App | CI | Added `lhci upload` step (with `LHCI_GITHUB_APP_TOKEN`) to both desktop and mobile jobs; moved token off `assert` onto `upload` where it is actually consumed | `.github/workflows/ci.yml` |
+| L-3 | CI | `LHCI_GITHUB_APP_TOKEN` now passed to the mobile upload step — PR annotations appear for both desktop and mobile runs | `.github/workflows/ci.yml` |
+| L-4 | package.json | Fixed invalid semver `"^0.14.x"` → `"^0.14.0"` | `package.json` |
+| S-1, C-3 | CI | Added `npm audit --audit-level=high` step in the `build` job before building — high/critical CVEs now fail the pipeline | `.github/workflows/ci.yml` |
+| S-2 | GitHub | Created `.github/dependabot.yml` — weekly npm + Actions updates, minor/patch grouped into one PR per week, major versions ignored | `.github/dependabot.yml` |
+| T-1 | Jest | Added `coverageThreshold` to `jest.config.ts` — 70 % lines/functions/statements, 60 % branches; CI fails if coverage drops below these floors | `jest.config.ts` |
+
+### How the GitHub App now shows on PRs
+
+```
+lhci collect   →  writes reports to .lighthouseci/
+lhci assert    →  checks budgets, exits 1 on failure (job fails here)
+lhci upload    →  posts .lighthouseci/ to temporary-public-storage,
+                  then uses LHCI_GITHUB_APP_TOKEN to write a commit
+                  status check on the PR with a link to the report
+```
+
+Every PR now shows status checks like:
+
+```
+✅ lhci/url:localhost/optimized  97 perf · 98 a11y · view report →
+✅ lhci/url:localhost/dashboard  94 perf · 98 a11y · view report →
+⚠️ lhci/url:localhost/bad        21 perf (intentionally relaxed budget)
+```
+
+**One-time repo setup** — add the secret from the GitHub App installation page:
+> **Settings → Secrets and variables → Actions → New repository secret**
+> `LHCI_GITHUB_APP_TOKEN` = token from the Lighthouse CI App
 
 ---
 
@@ -285,8 +324,8 @@ Severity: 🔴 Critical · 🟠 High · 🟡 Medium · 🔵 Low
 
 | # | Sev | Finding | Recommendation |
 |---|-----|---------|----------------|
-| S-1 | 🔴 | **No `npm audit` in CI.** Vulnerable dependencies ship silently. | Add `npm audit --audit-level=high` as a pre-build gate. |
-| S-2 | 🔴 | **No Dependabot config.** Outdated dependencies accumulate indefinitely. | Add `.github/dependabot.yml` with weekly npm + Actions updates. |
+| S-1 | ✅ | ~~**No `npm audit` in CI.**~~ Fixed — `npm audit --audit-level=high` added to `build` job. | — |
+| S-2 | ✅ | ~~**No Dependabot config.**~~ Fixed — `.github/dependabot.yml` created with weekly npm + Actions schedule. | — |
 | S-3 | 🟠 | **No Content-Security-Policy header.** `next.config.ts` sets X-Frame-Options etc. but omits CSP — the primary XSS defence. | Add a `Content-Security-Policy` header in the `headers()` block; start in report-only mode. |
 | S-4 | 🟠 | **Docker image not scanned for CVEs.** Final Alpine image is built and discarded without vulnerability scanning. | Add a Trivy or Grype scan step after `docker build` in the `docker` CI job. |
 | S-5 | 🟡 | **No secret scanning.** Accidental credential commits are not caught. | Enable GitHub secret scanning in repo settings (free for public repos). |
@@ -299,7 +338,7 @@ Severity: 🔴 Critical · 🟠 High · 🟡 Medium · 🔵 Low
 
 | # | Sev | Finding | Recommendation |
 |---|-----|---------|----------------|
-| T-1 | 🔴 | **No coverage threshold enforced.** `jest.config.ts` has no `coverageThreshold`. Coverage can drop to 0 % and CI stays green. | Add `coverageThreshold: { global: { lines: 70, functions: 70, branches: 60 } }`. |
+| T-1 | ✅ | ~~**No coverage threshold enforced.**~~ Fixed — `coverageThreshold` added: 70 % lines/functions/statements, 60 % branches. | — |
 | T-2 | 🔴 | **E2E tests permanently disabled** (`if: false`). Any regression in user-visible flows is undetected. | Diagnose and fix E2E failures; restore to `push` + `main` gate. |
 | T-3 | 🟠 | **No accessibility testing in E2E.** Heading-order bugs were only caught by Lighthouse, not by fast unit/E2E checks. | Integrate `@axe-core/playwright` — catches a11y regressions in milliseconds vs Lighthouse minutes. |
 | T-4 | 🟠 | **No visual regression testing.** Component layout changes are invisible to the test suite. | Add Playwright screenshot baseline tests for `VitalsPanel` and `MetricBadge`. |
@@ -313,9 +352,9 @@ Severity: 🔴 Critical · 🟠 High · 🟡 Medium · 🔵 Low
 | # | Sev | Finding | Recommendation |
 |---|-----|---------|----------------|
 | L-1 | 🔴 | **No historical baseline / regression detection.** `filesystem` saves per-run but has no cross-PR comparison. A 5-point creep over 10 PRs is invisible. | Self-host `@lhci/server` or use the Lighthouse CI GitHub App with `target: "lhci"` for baseline comparison. |
-| L-2 | 🟠 | **`devtools` throttling is non-deterministic in shared CI runners.** CPU/network via DevTools Protocol is affected by host load, producing high run-to-run variance. | Use `throttlingMethod: "simulate"` in CI for reproducibility; keep `devtools` for local investigation only. |
-| L-3 | 🟠 | **`LHCI_GITHUB_APP_TOKEN` not passed to the mobile job.** PR annotations only appear for the desktop run. | Add `LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}` to the mobile assert step. |
-| L-4 | 🟡 | **`@lhci/cli: "^0.14.x"` is invalid semver.** npm treats `.x` unpredictably. | Change to `"^0.14.0"`. |
+| L-2 | ✅ | ~~**`devtools` throttling is non-deterministic.**~~ Fixed — both configs reverted to `"simulate"` with explanatory comment. | — |
+| L-3 | ✅ | ~~**`LHCI_GITHUB_APP_TOKEN` not passed to the mobile job.**~~ Fixed — token added to `lhci upload` in both desktop and mobile jobs. | — |
+| L-4 | ✅ | ~~**`@lhci/cli: "^0.14.x"` is invalid semver.**~~ Fixed — changed to `"^0.14.0"`. | — |
 | L-5 | 🟡 | **No Lighthouse run against staging/preview URLs.** CI audits `localhost` — skips real CDN, TLS, and network overhead. | Add a post-deploy Lighthouse run against the Vercel preview URL via `LHCI_BUILD_CONTEXT__CURRENT_HASH`. |
 | L-6 | 🔵 | **/bad excluded from mobile run.** Mobile users hitting the bad page have no budget. | Add `/bad` to `.lighthouserc.mobile.js` URLs with warn-only assertions to surface the data. |
 
@@ -382,30 +421,30 @@ Severity: 🔴 Critical · 🟠 High · 🟡 Medium · 🔵 Low
 
 Ordered by risk × effort — tackle in sequence.
 
-| Priority | ID | Title | Effort |
-|----------|----|-------|--------|
-| 1 | S-1, C-3 | `npm audit --audit-level=high` gate in CI | 30 min |
-| 2 | S-2 | Dependabot for npm + GitHub Actions | 15 min |
-| 3 | T-1 | Coverage threshold in `jest.config.ts` | 15 min |
-| 4 | L-4 | Fix `@lhci/cli` semver `^0.14.x` → `^0.14.0` | 5 min |
-| 5 | L-3 | Add `LHCI_GITHUB_APP_TOKEN` to mobile Lighthouse job | 5 min |
-| 6 | L-2 | Revert Lighthouse throttling to `simulate` in CI | 10 min |
-| 7 | T-2 | Re-enable and fix E2E tests | 1–2 h |
-| 8 | O-1 | Wire `/api/vitals` to a real time-series data store | 2–4 h |
-| 9 | L-1 | Self-host LHCI server for PR regression detection | 2–4 h |
-| 10 | B-1 | `size-limit` bundle size gate in CI | 30 min |
-| 11 | S-3 | Content-Security-Policy header (report-only first) | 1–2 h |
-| 12 | S-4 | Trivy Docker image CVE scan in CI | 20 min |
-| 13 | C-2 | Replace `sleep 5` with health-check wait loop | 15 min |
-| 14 | C-1 | Share `npm ci` cache across CI jobs | 1 h |
-| 15 | T-3 | `@axe-core/playwright` in E2E tests | 1 h |
-| 16 | O-2 | Sentry integration (`@sentry/nextjs`) | 1 h |
-| 17 | Q-1 | `husky` + `lint-staged` pre-commit hooks | 30 min |
-| 18 | C-4 | Pin `ubuntu-latest` → `ubuntu-24.04` | 5 min |
-| 19 | C-7 | `.nvmrc` + `engines` field in `package.json` | 5 min |
-| 20 | Q-2, Q-3 | Stricter TypeScript flags (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) | 30 min |
-| 21 | I-1 | Multi-arch Docker build (`linux/amd64,linux/arm64`) | 1 h |
-| 22 | L-5 | Post-deploy Lighthouse run against Vercel preview URL | 2 h |
+| Priority | ID | Title | Effort | Status |
+|----------|----|-------|--------|--------|
+| 1 | S-1, C-3 | `npm audit --audit-level=high` gate in CI | 30 min | ✅ Done |
+| 2 | S-2 | Dependabot for npm + GitHub Actions | 15 min | ✅ Done |
+| 3 | T-1 | Coverage threshold in `jest.config.ts` | 15 min | ✅ Done |
+| 4 | L-4 | Fix `@lhci/cli` semver `^0.14.x` → `^0.14.0` | 5 min | ✅ Done |
+| 5 | L-3 | `LHCI_GITHUB_APP_TOKEN` to mobile + GitHub App upload wiring | 5 min | ✅ Done |
+| 6 | L-2 | Revert Lighthouse throttling to `simulate` in CI | 10 min | ✅ Done |
+| 7 | T-2 | Re-enable and fix E2E tests | 1–2 h | ⏳ Open |
+| 8 | O-1 | Wire `/api/vitals` to a real time-series data store | 2–4 h | ⏳ Open |
+| 9 | L-1 | Self-host LHCI server for PR regression detection | 2–4 h | ⏳ Open |
+| 10 | B-1 | `size-limit` bundle size gate in CI | 30 min | ⏳ Open |
+| 11 | S-3 | Content-Security-Policy header (report-only first) | 1–2 h | ⏳ Open |
+| 12 | S-4 | Trivy Docker image CVE scan in CI | 20 min | ⏳ Open |
+| 13 | C-2 | Replace `sleep 5` with health-check wait loop | 15 min | ⏳ Open |
+| 14 | C-1 | Share `npm ci` cache across CI jobs | 1 h | ⏳ Open |
+| 15 | T-3 | `@axe-core/playwright` in E2E tests | 1 h | ⏳ Open |
+| 16 | O-2 | Sentry integration (`@sentry/nextjs`) | 1 h | ⏳ Open |
+| 17 | Q-1 | `husky` + `lint-staged` pre-commit hooks | 30 min | ⏳ Open |
+| 18 | C-4 | Pin `ubuntu-latest` → `ubuntu-24.04` | 5 min | ⏳ Open |
+| 19 | C-7 | `.nvmrc` + `engines` field in `package.json` | 5 min | ⏳ Open |
+| 20 | Q-2, Q-3 | Stricter TypeScript flags (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) | 30 min | ⏳ Open |
+| 21 | I-1 | Multi-arch Docker build (`linux/amd64,linux/arm64`) | 1 h | ⏳ Open |
+| 22 | L-5 | Post-deploy Lighthouse run against Vercel preview URL | 2 h | ⏳ Open |
 
 ---
 
@@ -413,8 +452,13 @@ Ordered by risk × effort — tackle in sequence.
 
 - **TypeScript** — `strict: true`, `isolatedModules`, `noEmit`
 - **ESLint** — `eslint-config-next/core-web-vitals` + TypeScript rules; custom `set-state-in-effect` rule enforced
-- **Lighthouse CI** — desktop + mobile, `assertMatrix` per URL, filesystem reports as artifacts, 60 s timeout
-- **Performance budgets** — LCP, CLS, TBT, category scores enforced as CI error gates
+- **TypeScript** — `strict: true`, `isolatedModules`, `noEmit`
+- **ESLint** — `eslint-config-next/core-web-vitals` + TypeScript rules; `set-state-in-effect` rule enforced
+- **Lighthouse CI** — desktop + mobile, `assertMatrix` per URL, `simulate` throttling, 60 s timeout, GitHub App status checks on every PR
+- **Performance budgets** — LCP, CLS, TBT, category scores enforced as CI error gates; per-URL rules via `assertMatrix`
+- **Security audit** — `npm audit --audit-level=high` blocks the build on high/critical CVEs
+- **Dependency management** — Dependabot opens weekly PRs for npm + Actions; minor/patch grouped; major ignored
+- **Coverage enforcement** — Jest `coverageThreshold` at 70 % lines/functions/statements, 60 % branches
 - **Security headers** — X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy
 - **Rate limiting** — sliding window on `/api/vitals` with documented Redis upgrade path
 - **Docker** — multi-stage (deps → builder → runner), non-root user, `HEALTHCHECK`, ~150 MB final image, `ARG DOCKER_BUILD` propagated correctly
@@ -423,4 +467,5 @@ Ordered by risk × effort — tackle in sequence.
 - **CDN caching** — immutable hashed assets, `stale-while-revalidate` for HTML, `s-maxage=60`
 - **ISR** — `revalidate: 60` on optimised page; zero cold-cache TTFB penalty
 - **Core Web Vitals instrumentation** — `web-vitals` → `sendBeacon` / `keepalive` fetch → `/api/vitals`
-- **Accessibility** — heading hierarchy enforced by Lighthouse CI `assertMatrix`; `heading-order` promoted to error on good pages
+- **Accessibility** — heading hierarchy fixed across 6 components; `heading-order` enforced as error on good pages via `assertMatrix`
+- **`@lhci/cli` semver** — valid `^0.14.0` in `devDependencies`; available locally and on Vercel

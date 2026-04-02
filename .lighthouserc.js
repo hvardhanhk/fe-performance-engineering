@@ -38,9 +38,11 @@ module.exports = {
       numberOfRuns: 3,
       settings: {
         preset: "desktop",
-        // devtools throttling actually applies CPU/network via Chrome DevTools
-        // Protocol — closer to real field data than simulate's mathematical model
-        throttlingMethod: "devtools",
+        // "simulate" applies a deterministic mathematical throttling model.
+        // "devtools" throttles via Chrome DevTools Protocol against the real
+        // host CPU — scores vary with CI runner load, breaking budget gates.
+        // Always use "simulate" in CI; reserve "devtools" for local profiling.
+        throttlingMethod: "simulate",
         throttling: {
           rttMs: 40,
           throughputKbps: 10240,
@@ -124,10 +126,11 @@ module.exports = {
     },
 
     upload: {
-      // Saves reports to .lighthouseci/ so CI can upload them as artifacts.
-      // Switch to target:'lhci' + serverBaseUrl for persistent trend history.
-      target: "filesystem",
-      outputDir: ".lighthouseci",
+      // temporary-public-storage gives every run a public URL that the
+      // Lighthouse CI GitHub App links to in the PR status check.
+      // Reports are ALSO saved to .lighthouseci/ by lhci collect (always),
+      // so the CI artifact upload step still works independently.
+      target: "temporary-public-storage",
     },
   },
 };

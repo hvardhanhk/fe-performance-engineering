@@ -24,6 +24,19 @@ const config: Config = {
     "!src/**/*.d.ts",
     "!src/app/layout.tsx", // Root layout — hard to unit test meaningfully
   ],
+
+  // CI fails if coverage drops below these floors.
+  // Raise the thresholds incrementally as the test suite matures —
+  // never lower them. branches is lower because many branches are
+  // in render paths that require integration-level tests to exercise.
+  coverageThreshold: {
+    global: {
+      lines:     70,
+      functions: 70,
+      branches:  60,
+      statements: 70,
+    },
+  },
 };
 
 export default createJestConfig(config);
