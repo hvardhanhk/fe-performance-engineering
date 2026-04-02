@@ -82,6 +82,7 @@ export function BadPageClient() {
     const _cached = localStorage.getItem("bad-page-cache");
 
     // ❌ ANTI-PATTERN: Generating chart data inline with no memoisation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setChartData(
       Array.from({ length: 20 }, (_, i) => ({
         name: String(i),

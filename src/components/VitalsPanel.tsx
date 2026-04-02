@@ -26,15 +26,20 @@ export function VitalsPanel({ page }: Props) {
   const [snapshot, setSnapshot] = useState<VitalsSnapshot | null>(null);
 
   useEffect(() => {
-    // Initial read
-    setSnapshot(getLatestSnapshot(page));
+    const update = () => setSnapshot(getLatestSnapshot(page));
+
+    // Defer the initial read so setState is not called synchronously in the
+    // effect body (avoids the react-hooks/set-state-in-effect lint error and
+    // the cascading-render risk it guards against).
+    const initId = setTimeout(update, 0);
 
     // Poll for updates — captures metrics as user interacts
-    const id = setInterval(() => {
-      setSnapshot(getLatestSnapshot(page));
-    }, 2000);
+    const id = setInterval(update, 2000);
 
-    return () => clearInterval(id);
+    return () => {
+      clearTimeout(initId);
+      clearInterval(id);
+    };
   }, [page]);
 
   const metrics = [
