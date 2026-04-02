@@ -1,0 +1,10 @@
+<svg width="160" height="120" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="120" fill="#111"/>
+  <rect x="10" y="10" width="140" height="15" fill="#1a1a1a" rx="2"/>
+  <!-- skeleton loaders — reserved space, no CLS -->
+  <rect x="10" y="30" width="140" height="8" fill="#1c1c1c" rx="2"/>
+  <rect x="10" y="42" width="90" height="8" fill="#1c1c1c" rx="2"/>
+  <rect x="10" y="55" width="65" height="45" fill="#1c1c1c" rx="2"/>
+  <rect x="80" y="55" width="70" height="45" fill="#1c1c1c" rx="2"/>
+  <text x="80" y="108" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">0.2s — SSR shell (skeletons)</text>
+</svg>

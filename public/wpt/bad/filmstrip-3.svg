@@ -1,0 +1,10 @@
+<svg width="160" height="120" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="120" fill="#111"/>
+  <!-- Partial content — layout shifting -->
+  <rect x="10" y="10" width="140" height="15" fill="#1a1a1a" rx="2"/>
+  <rect x="10" y="32" width="80" height="60" fill="#1e1e1e" rx="2"/>
+  <rect x="98" y="32" width="52" height="60" fill="#1e1e1e" rx="2"/>
+  <!-- layout shift indicator -->
+  <path d="M10 95 L150 95" stroke="#ef4444" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="80" y="108" text-anchor="middle" fill="#ef4444" font-size="8" font-family="monospace">2.8s — layout shift (CLS 0.38)</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="monospace" font-size="9">
+  <rect width="600" height="320" fill="#0a0a0a"/>
+
+  <!-- Time axis labels -->
+  <text x="120" y="14" fill="#555">0</text>
+  <text x="200" y="14" fill="#555">1s</text>
+  <text x="280" y="14" fill="#555">2s</text>
+  <text x="360" y="14" fill="#555">3s</text>
+  <text x="440" y="14" fill="#555">4s</text>
+  <text x="520" y="14" fill="#555">5s</text>
+
+  <!-- Grid lines -->
+  <line x1="200" y1="18" x2="200" y2="310" stroke="#1e1e1e" stroke-width="1"/>
+  <line x1="280" y1="18" x2="280" y2="310" stroke="#1e1e1e" stroke-width="1"/>
+  <line x1="360" y1="18" x2="360" y2="310" stroke="#1e1e1e" stroke-width="1"/>
+  <line x1="440" y1="18" x2="440" y2="310" stroke="#1e1e1e" stroke-width="1"/>
+  <line x1="520" y1="18" x2="520" y2="310" stroke="#1e1e1e" stroke-width="1"/>
+
+  <!-- Row 1: HTML (render-blocking) -->
+  <text x="5" y="33" fill="#aaa">HTML</text>
+  <rect x="120" y="22" width="56" height="14" fill="#3b82f6" rx="2"/>
+  <text x="180" y="33" fill="#555">700ms (render-blocking)</text>
+
+  <!-- Row 2: bundle.js (HUGE) -->
+  <text x="5" y="53" fill="#aaa">bundle.js</text>
+  <rect x="176" y="42" width="160" height="14" fill="#ef4444" rx="2"/>
+  <text x="340" y="53" fill="#555">2000ms — 842KB ❌</text>
+
+  <!-- Row 3: styles.css -->
+  <text x="5" y="73" fill="#aaa">styles.css</text>
+  <rect x="176" y="62" width="22" height="14" fill="#f59e0b" rx="2"/>
+
+  <!-- Row 4: API fetch (blocks render) -->
+  <text x="5" y="93" fill="#aaa">API /posts</text>
+  <rect x="336" y="82" width="88" height="14" fill="#ef4444" rx="2"/>
+  <text x="428" y="93" fill="#555">1100ms (no cache)</text>
+
+  <!-- Row 5–8: images (unoptimised) -->
+  <text x="5" y="113" fill="#aaa">image-1.jpg</text>
+  <rect x="336" y="102" width="112" height="14" fill="#ef4444" rx="2"/>
+  <text x="452" y="113" fill="#555">1.4MB</text>
+
+  <text x="5" y="133" fill="#aaa">image-2.jpg</text>
+  <rect x="336" y="122" width="96" height="14" fill="#ef4444" rx="2"/>
+  <text x="436" y="133" fill="#555">1.2MB</text>
+
+  <text x="5" y="153" fill="#aaa">image-3.jpg</text>
+  <rect x="336" y="142" width="104" height="14" fill="#ef4444" rx="2"/>
+  <text x="444" y="153" fill="#555">1.3MB</text>
+
+  <text x="5" y="173" fill="#aaa">image-4.jpg</text>
+  <rect x="352" y="162" width="120" height="14" fill="#ef4444" rx="2"/>
+  <text x="476" y="173" fill="#555">1.5MB</text>
+
+  <!-- LCP marker -->
+  <line x1="472" y1="18" x2="472" y2="290" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="440" y="295" fill="#ef4444">LCP 4.8s</text>
+
+  <!-- Summary -->
+  <rect x="5" y="300" width="590" height="14" fill="#1a0a0a" rx="2"/>
+  <text x="10" y="311" fill="#ef4444">Total: 4.8s | Requests: 12 | Transfer: 5.2MB | ❌ No caching | ❌ Render-blocking JS | ❌ No image optimisation</text>
+</svg>
