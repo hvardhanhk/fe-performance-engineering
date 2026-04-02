@@ -40,6 +40,10 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# DOCKER_BUILD triggers output:'standalone' in next.config.ts
+ARG DOCKER_BUILD=true
+ENV DOCKER_BUILD=${DOCKER_BUILD}
+
 RUN npm run build
 
 # ─── Stage 3: Runtime ────────────────────────────────────────────────────────
