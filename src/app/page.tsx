@@ -439,7 +439,7 @@ FROM node:20-alpine AS runner   # minimal runtime (~150MB)`}
               <p>Set <code className="font-mono text-xs">NEXT_PUBLIC_SENTRY_DSN</code> in .env.local. Integration points are marked with comments in <code className="font-mono text-xs">src/app/error.tsx</code> (<code className="font-mono text-xs">Sentry.captureException</code>) and <code className="font-mono text-xs">/api/vitals/route.ts</code> (<code className="font-mono text-xs">Sentry.captureEvent</code> for poor-rated metrics). Sentry Performance tracks INP regressions across releases automatically.</p>
             </Step>
             <Step title="GA4 / Amplitude — product analytics">
-              <p>Set <code className="font-mono text-xs">NEXT_PUBLIC_GA4_MEASUREMENT_ID</code> or <code className="font-mono text-xs">NEXT_PUBLIC_AMPLITUDE_API_KEY</code>. Wire into <code className="font-mono text-xs">VitalsReporter.tsx</code>: call <code className="font-mono text-xs">gtag("event", "LCP", ...)</code> or <code className="font-mono text-xs">amplitude.track()</code> in the <code className="font-mono text-xs">handle</code> callback. This enables correlating performance metrics with user behaviour — e.g. "do users with LCP &gt; 3s have 2× higher bounce rates?"</p>
+              <p>Set <code className="font-mono text-xs">NEXT_PUBLIC_GA4_MEASUREMENT_ID</code> or <code className="font-mono text-xs">NEXT_PUBLIC_AMPLITUDE_API_KEY</code>. Wire into <code className="font-mono text-xs">VitalsReporter.tsx</code>: call <code className="font-mono text-xs">gtag(&quot;event&quot;, &quot;LCP&quot;, ...)</code> or <code className="font-mono text-xs">amplitude.track()</code> in the <code className="font-mono text-xs">handle</code> callback. This enables correlating performance metrics with user behaviour — e.g. &quot;do users with LCP &gt; 3s have 2× higher bounce rates?&quot;</p>
             </Step>
           </ImplBlock>
 
@@ -504,7 +504,7 @@ FROM node:20-alpine AS runner   # minimal runtime (~150MB)`}
           </ScaleBlock>
 
           <ScaleBlock title="ISR at scale — Background revalidation">
-            <p>ISR means N simultaneous users all hit the CDN cache — they don't trigger N origin requests. Only the CDN itself makes a single revalidation request when the cache expires. This is fundamentally more scalable than per-request SSR. The cost of serving 1M users vs 1 user is nearly identical.</p>
+            <p>ISR means N simultaneous users all hit the CDN cache — they don&apos;t trigger N origin requests. Only the CDN itself makes a single revalidation request when the cache expires. This is fundamentally more scalable than per-request SSR. The cost of serving 1M users vs 1 user is nearly identical.</p>
           </ScaleBlock>
 
           <ScaleBlock title="Edge Functions — Regional compute without warm-up">
