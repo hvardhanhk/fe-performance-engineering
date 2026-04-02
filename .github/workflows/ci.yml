@@ -120,6 +120,7 @@ jobs:
           name: next-build
           path: .next/
           retention-days: 1
+          include-hidden-files: true
 
   # ─── 5. Lighthouse CI ───────────────────────────────────────────────────────
   lighthouse:
@@ -143,11 +144,8 @@ jobs:
           name: next-build
           path: .next/
 
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli@0.14.x
-
       - name: Run Lighthouse CI
-        run: lhci autorun
+        run: npx lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
           NEXT_TELEMETRY_DISABLED: 1
