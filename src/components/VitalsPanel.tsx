@@ -53,9 +53,9 @@ export function VitalsPanel({ page }: Props) {
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-[--foreground]/60">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-[--foreground]/60">
           Live Core Web Vitals
-        </h3>
+        </h2>
         <span className="flex items-center gap-1.5 text-xs text-[--foreground]/40">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[--good] animate-pulse" />
           Live

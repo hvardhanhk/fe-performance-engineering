@@ -50,7 +50,7 @@ export function WebPageTestPanel() {
     <div className="space-y-6">
       {/* Header */}
       <div className="card space-y-2">
-        <h3 className="font-semibold">WebPageTest Results</h3>
+        <h2 className="font-semibold">WebPageTest Results</h2>
         <p className="text-sm text-[--foreground]/60">
           Tests run from {bad.location} over {bad.connection}.
           Filmstrip and waterfall show the full visual progression and request timeline.

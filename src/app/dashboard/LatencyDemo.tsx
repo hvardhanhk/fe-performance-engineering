@@ -86,7 +86,7 @@ export function LatencyDemo({ initialData }: Props) {
   return (
     <div className="space-y-6">
       <div className="card space-y-3">
-        <h3 className="font-semibold">Edge vs Origin Latency</h3>
+        <h2 className="font-semibold">Edge vs Origin Latency</h2>
         <p className="text-sm text-[--foreground]/60">
           Measures Time to First Byte (TTFB) from an edge worker vs an origin
           API route. Click &ldquo;Run measurement&rdquo; to add a data point.
@@ -101,7 +101,7 @@ export function LatencyDemo({ initialData }: Props) {
       </div>
 
       <div className="card">
-        <h3 className="text-sm font-semibold mb-4">TTFB Comparison (ms, lower is better)</h3>
+        <h2 className="text-sm font-semibold mb-4">TTFB Comparison (ms, lower is better)</h2>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={displayData}>
             <XAxis dataKey="run" tick={{ fontSize: 11, fill: "var(--foreground)" }} opacity={0.7} />

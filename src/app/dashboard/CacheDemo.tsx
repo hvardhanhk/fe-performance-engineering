@@ -44,7 +44,7 @@ export function CacheDemo() {
   return (
     <div className="space-y-6">
       <div className="card space-y-3">
-        <h3 className="font-semibold">CDN Cache Demonstration</h3>
+        <h2 className="font-semibold">CDN Cache Demonstration</h2>
         <p className="text-sm text-[--foreground]/60">
           Click &ldquo;Bust cache&rdquo; to force a MISS (slow, origin hit), then
           click &ldquo;Cached request&rdquo; repeatedly to see HIT responses

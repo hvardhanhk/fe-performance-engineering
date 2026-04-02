@@ -194,9 +194,9 @@ export function DashboardClient({ comparison, lighthouse, bundles }: Props) {
 
           {/* Bar chart */}
           <div className="card space-y-3">
-            <h3 className="text-sm font-semibold">
+            <h2 className="text-sm font-semibold">
               Timing Comparison (ms, lower is better)
-            </h3>
+            </h2>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart
                 data={enrichedComparison.filter((e) => e.metric !== "CLS")}
@@ -267,7 +267,7 @@ export function DashboardClient({ comparison, lighthouse, bundles }: Props) {
 
           {/* Radar chart */}
           <div className="card">
-            <h3 className="text-sm font-semibold mb-4">Radar Comparison</h3>
+            <h2 className="text-sm font-semibold mb-4">Radar Comparison</h2>
             <ResponsiveContainer width="100%" height={320}>
               <RadarChart
                 data={[
@@ -311,9 +311,9 @@ export function DashboardClient({ comparison, lighthouse, bundles }: Props) {
               { page: "optimized", data: optBundle,   icon: "✅" },
             ].map(({ page, data, icon }) => (
               <div key={page} className="card space-y-3">
-                <h3 className="font-semibold">
+                <h2 className="font-semibold">
                   {icon} {page === "bad" ? "Bad Page" : "Optimized Page"}
-                </h3>
+                </h2>
                 <div className="space-y-2 text-sm">
                   {[
                     { label: "JavaScript", value: data.jsKb,    color: "var(--accent)" },
@@ -346,7 +346,7 @@ export function DashboardClient({ comparison, lighthouse, bundles }: Props) {
           </div>
 
           <div className="card">
-            <h3 className="text-sm font-semibold mb-4">Bundle Size Comparison</h3>
+            <h2 className="text-sm font-semibold mb-4">Bundle Size Comparison</h2>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart
                 data={[
@@ -387,7 +387,7 @@ export function DashboardClient({ comparison, lighthouse, bundles }: Props) {
         <div className="space-y-6">
           {(["LCP", "INP"] as const).map((metric) => (
             <div key={metric} className="card">
-              <h3 className="text-sm font-semibold mb-4">{metric} — 7-day trend</h3>
+              <h2 className="text-sm font-semibold mb-4">{metric} — 7-day trend</h2>
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart
                   data={generateTrend(metric, "bad").map((d, i) => ({

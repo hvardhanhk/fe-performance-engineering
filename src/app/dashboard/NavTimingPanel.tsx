@@ -61,7 +61,7 @@ export function NavTimingPanel() {
       <div className="card space-y-4">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-semibold">Navigation Timing Waterfall</h3>
+            <h2 className="font-semibold">Navigation Timing Waterfall</h2>
             <p className="text-xs text-[--foreground]/50 mt-0.5">
               Load the page then navigate here — shows the full pipeline breakdown.
             </p>
@@ -128,7 +128,7 @@ export function NavTimingPanel() {
       {/* Long Tasks */}
       <div className="card space-y-4">
         <div>
-          <h3 className="font-semibold">Long Tasks Observer</h3>
+          <h2 className="font-semibold">Long Tasks Observer</h2>
           <p className="text-xs text-[--foreground]/50 mt-0.5">
             Tasks &gt;50ms block the main thread and cause high INP.
             Detected automatically via PerformanceObserver.
