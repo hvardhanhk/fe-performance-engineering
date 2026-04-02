@@ -144,11 +144,23 @@ jobs:
           name: next-build
           path: .next/
 
-      - name: Run Lighthouse CI
-        run: npx lhci autorun
+      # Split autorun into explicit phases so reports are always written to
+      # .lighthouseci/ before assert can exit with code 1.
+      - name: Collect Lighthouse data
+        run: npx lhci collect
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Assert performance budgets
+        run: npx lhci assert
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Upload to temporary public storage
+        run: npx lhci upload
+        if: always()
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
       - name: Upload Lighthouse reports
         uses: actions/upload-artifact@v4
@@ -157,6 +169,7 @@ jobs:
           name: lighthouse-reports
           path: .lighthouseci/
           retention-days: 30
+          if-no-files-found: warn
 
   # ─── 6. E2E (Playwright) — only on push to main ────────────────────────────
   e2e:
