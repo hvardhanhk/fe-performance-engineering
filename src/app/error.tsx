@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 /**
  * Global error boundary — catches unhandled errors thrown during rendering.
  *
@@ -61,12 +62,12 @@ export default function GlobalError({ error, reset }: Props) {
           >
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="px-4 py-2 rounded bg-[--surface-hover] text-sm font-medium transition-colors"
           >
             Go home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

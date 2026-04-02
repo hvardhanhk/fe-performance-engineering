@@ -158,7 +158,7 @@ export default function HomePage() {
               <p>The page exports nothing from the server — it is an empty HTML shell. The browser receives a 200 with a blank body, then must download, parse, and run 842KB of JS before any content is visible. Compare: /optimized sends full pre-rendered HTML in the first response.</p>
             </Step>
             <Step title="Raw &lt;img&gt; tags with no dimensions → CLS 0.38">
-              <p>Browser allocates 0×0 pixels for each image. When the images load, every element below shifts down. CLS = cumulative sum of all layout shift scores. Four 1MB+ images each causing a shift = 0.38 CLS (threshold for "poor" is 0.25).</p>
+              <p>Browser allocates 0×0 pixels for each image. When the images load, every element below shifts down. CLS = cumulative sum of all layout shift scores. Four 1MB+ images each causing a shift = 0.38 CLS (threshold for &quot;poor&quot; is 0.25).</p>
             </Step>
             <Step title="No debounce on search → INP 620ms">
               <p>Every keystroke triggers a synchronous re-render of 500 list items plus an O(n²) filter function. The browser cannot paint between the input event and the re-render completing. INP = time from input event to next paint = 620ms.</p>
@@ -191,7 +191,7 @@ export default function HomePage() {
               <p>Server renders full HTML on the first build. CDN caches it. Every 60s, Next.js regenerates in the background — the user always gets a cached response (fast TTFB) while content stays fresh. This is the key ISR tradeoff vs SSR-on-demand.</p>
             </Step>
             <Step title="React Server Components (RSC) — zero client JS">
-              <p><code className="font-mono text-xs">OptimizedList</code> and <code className="font-mono text-xs">OptimizationCard</code> have no <code className="font-mono text-xs">"use client"</code> directive. They render to HTML on the server and ship zero JS to the browser. The client boundary is kept as small as possible: only <code className="font-mono text-xs">OptimizedSearch</code> (needs useState) is a Client Component.</p>
+              <p><code className="font-mono text-xs">OptimizedList</code> and <code className="font-mono text-xs">OptimizationCard</code> have no <code className="font-mono text-xs">&quot;use client&quot;</code> directive. They render to HTML on the server and ship zero JS to the browser. The client boundary is kept as small as possible: only <code className="font-mono text-xs">OptimizedSearch</code> (needs useState) is a Client Component.</p>
             </Step>
             <Step title="Suspense streaming + loading.tsx">
               <p><code className="font-mono text-xs">loading.tsx</code> wraps the page in an implicit Suspense boundary. The server sends the skeleton HTML with a 200 status immediately — the user sees structure in ~50ms while data resolves on the server. Skeletons have the same pixel dimensions as real content → CLS = 0 on the swap.</p>
@@ -200,7 +200,7 @@ export default function HomePage() {
               <code className="block font-mono text-xs bg-[--surface] px-3 py-2 rounded text-[--accent] mt-1">
                 {`<Image src={...} fill sizes="25vw" priority={idx === 0} />`}
               </code>
-              <p><code className="font-mono text-xs">priority</code> adds <code className="font-mono text-xs">&lt;link rel="preload"&gt;</code> in the document head — browser starts downloading the LCP candidate before CSS/JS parsing completes. Serves avif/webp (30–60% smaller than JPEG). Fixed aspect-ratio container prevents CLS.</p>
+              <p><code className="font-mono text-xs">priority</code> adds <code className="font-mono text-xs">&lt;link rel=&quot;preload&quot;&gt;</code> in the document head — browser starts downloading the LCP candidate before CSS/JS parsing completes. Serves avif/webp (30–60% smaller than JPEG). Fixed aspect-ratio container prevents CLS.</p>
             </Step>
             <Step title="Dynamic import + IntersectionObserver → code splitting">
               <p>The recharts bundle (~120KB) is in a separate async chunk. <code className="font-mono text-xs">LazyChart</code> loads it only when the chart section enters the viewport (with a 200px root margin for pre-loading). This removes 120KB from the initial parse — measurable FCP improvement on 3G.</p>
@@ -354,7 +354,7 @@ GET /jsonResult.php?test={id}`}
               <p>Middleware stamps <code className="font-mono text-xs">x-user-country</code>, <code className="font-mono text-xs">x-middleware-duration</code>, and <code className="font-mono text-xs">x-served-by</code> headers on every response. Adds <code className="font-mono text-xs">Vary: x-vercel-ip-country</code> so CDN caches are partitioned by country — preventing a UK user from receiving a US-personalised cached response. Runs before every page request with &lt;1ms overhead.</p>
             </Step>
             <Step title="TTFB comparison — ~12ms edge vs ~180ms origin">
-              <p>The edge route uses <code className="font-mono text-xs">runtime: "edge"</code> — it runs in a V8 isolate at the nearest CDN PoP. No cold start. No TCP round-trip to a single-region server. The origin route simulates 180ms processing time — representing a real origin server in us-east-1 serving a user in London.</p>
+              <p>The edge route uses <code className="font-mono text-xs">runtime: &quot;edge&quot;</code> — it runs in a V8 isolate at the nearest CDN PoP. No cold start. No TCP round-trip to a single-region server. The origin route simulates 180ms processing time — representing a real origin server in us-east-1 serving a user in London.</p>
             </Step>
             <Step title="When NOT to use edge">
               <p>Edge has a 1MB code size limit (Vercel), no Node.js APIs (no filesystem, no native modules), and no direct database connections. Use edge for: auth checks, geo-redirects, A/B testing headers, request rewriting. Use origin for: database queries, file operations, complex business logic, large dependencies.</p>
@@ -399,7 +399,7 @@ GET /jsonResult.php?test={id}`}
 FROM node:20-alpine AS builder  # full build
 FROM node:20-alpine AS runner   # minimal runtime (~150MB)`}
               </code>
-              <p><code className="font-mono text-xs">output: "standalone"</code> in next.config.ts copies only the minimum files to run the server. Image: ~150MB vs ~1GB without standalone mode. Non-root user for security. Health check so ECS/Kubernetes restarts on failure.</p>
+              <p><code className="font-mono text-xs">output: &quot;standalone&quot;</code> in next.config.ts copies only the minimum files to run the server. Image: ~150MB vs ~1GB without standalone mode. Non-root user for security. Health check so ECS/Kubernetes restarts on failure.</p>
             </Step>
             <Step title="CI pipeline — 6 jobs">
               <p><code className="font-mono text-xs">typecheck</code> → <code className="font-mono text-xs">lint</code> → <code className="font-mono text-xs">test</code> (parallel, all fail-fast) → <code className="font-mono text-xs">build</code> (artefact shared) → <code className="font-mono text-xs">lhci</code> (performance budgets) + <code className="font-mono text-xs">e2e</code> (on main only) → <code className="font-mono text-xs">docker</code> smoke test. Build artefact is passed between jobs via <code className="font-mono text-xs">actions/upload-artifact</code> — avoids rebuilding in each job.</p>
